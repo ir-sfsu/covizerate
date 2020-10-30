@@ -1,5 +1,5 @@
 
-# covizerate
+# covizerate - COhort VIZualization RATEs
 
 <!-- badges: start -->
 <!-- badges: end -->

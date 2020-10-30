@@ -4,10 +4,12 @@
 \alias{covizerate}
 \title{Create a covizerate visualization}
 \usage{
-covizerate(data)
+covizerate(data, title = NULL)
 }
 \arguments{
-\item{data}{a table of data.}
+\item{data}{a table of data}
+
+\item{title}{chart title}
 }
 \description{
 Create a covizerate visualization

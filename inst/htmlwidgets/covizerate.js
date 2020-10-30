@@ -11,11 +11,11 @@ HTMLWidgets.widget({
       renderValue: function(opts) {
 
         const data = HTMLWidgets.dataframeToD3(opts.data);
-
-        let margin = ({top: 40, right: 60, bottom: 30, left: 65});
+        let margin = ({top: 65, right: 60, bottom: 30, left: 65});
         let formatPercent = d3.format(".0%");
         function yearTickFormat(x) {return x === 0 ? "Arrival" : "Year " + x}
         let bisectDate = d3.bisector(function(d) { return d.year; }).left;
+        let title = opts.hasOwnProperty("title") ? opts.title : "";
 
         const svg = d3.select(el)
                     .append("svg")
@@ -38,7 +38,7 @@ HTMLWidgets.widget({
             .domain(["continuation", "graduation"])
             .range(["#463077", "#E8BF6A"]); */
 
-        area = d3.area()
+        let area = d3.area()
             .x(d => x(d.data.year))
             .y0(d => y(d[0]))
             .y1(d => y(d[1]))
@@ -56,7 +56,15 @@ HTMLWidgets.widget({
             .call(d3.axisLeft(y).tickValues([0.2, 0.4, 0.6, 0.8, 1]).tickFormat(formatPercent))
             .call(g => g.select(".domain").remove());
 
-          svg.append("linearGradient")
+        svg.append("text")
+            .attr("x", margin.left)
+            .attr("y", margin.top/2.7)
+            //.attr("font-weight", "bold")
+            .attr("font-size", "1.5em")
+            .text(title)
+
+
+            svg.append("linearGradient")
               .attr("id", "perc-gradient1")
               .attr("gradientUnits", "userSpaceOnUse")
               .attr("x1", 0).attr("y1", y(0))

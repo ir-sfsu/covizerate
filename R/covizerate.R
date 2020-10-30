@@ -1,14 +1,16 @@
 #' Create a covizerate visualization
 #'
-#' @param data a table of data.
+#' @param data a table of data
+#' @param title chart title
 #'
 #' @import htmlwidgets
 #'
 #' @export
-covizerate <- function(data) {
+covizerate <- function(data, title = NULL) {
 
   x = list(
-    data = data
+    data = data,
+    title = title
   )
 
   htmlwidgets::createWidget(
