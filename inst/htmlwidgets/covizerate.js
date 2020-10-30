@@ -109,10 +109,20 @@ HTMLWidgets.widget({
               .attr("stroke", "black")
               .attr("fill", "gold");
 
+          focus.append("rect")
+            .attr("class", "text-bb")
+            .attr("x", -68)
+            .attr("width", 135)
+            .attr("opacity", 0.8)
+            .attr("rx", 10)
+            .attr("stroke", "lightgrey")
+            .attr("fill", "white")
+            .attr("visibility", "hidden");
+
           focus.append("text")
               .attr("class", "cont-text")
               .attr("text-anchor", "middle")
-              .attr("y", -20);
+              .attr("y", -18);
 
           focus.append("text")
               .attr("class", "grad-text")
@@ -129,16 +139,19 @@ HTMLWidgets.widget({
               .on("mousemove", mousemove);
 
           function mousemove() {
-            var x0 = x.invert(d3.mouse(this)[0]),
+            let x0 = x.invert(d3.mouse(this)[0]),
                 i = bisectDate(data, x0, 1),
                 d0 = data[i - 1],
                 d1 = data[i],
                 d = x0 - d0.year > d1.year - x0 ? d1 : d0;
             focus.attr("transform", `translate(${x(d.year)}, ${y(d.continuation)})`);
+            focus.select(".text-bb")
+              .attr("visibility", "visible")
+              .attr("height", () => d.graduation > 0 ? 50 : 25)
+              .attr("y", () => d.graduation > 0 ? -60 : -35);
             focus.select(".cont-text").text(() => 'Continuation: ' + formatPercent(d.continuation));
             focus.select(".grad-text").text(() => d.graduation > 0 ? 'Graduation: ' + formatPercent(d.graduation) : '');
           }
-
       },
 
       resize: function(width, height) {
