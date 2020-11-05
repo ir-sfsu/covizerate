@@ -8,6 +8,9 @@
 #' @export
 covizerate <- function(data, title = NULL) {
 
+  stopifnot(inherits(data, "data.frame"))
+  stopifnot(all(c("year", "continuation", "graduation") %in% names(data)))
+
   x = list(
     data = data,
     title = title
@@ -17,6 +20,20 @@ covizerate <- function(data, title = NULL) {
     name = 'covizerate',
     x
   )
+}
+
+#' Various options for the covizerate widget
+#'
+#' @param covizerate An object of class 'covizerate'
+#' @param vline_stroke Stroke color of the vertical line
+#' @param grad_fill Fill color of the grad potion
+#'
+#' @return
+#' @export
+cvz_options <- function(covizerate, vline_stroke = "red", grad_fill = "#E8BF6A") {
+  covizerate$x$vline_stroke <- vline_stroke
+  covizerate$x$grad_fill <- grad_fill
+  return(covizerate)
 }
 
 #' Shiny bindings for covizerate

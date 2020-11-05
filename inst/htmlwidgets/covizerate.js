@@ -12,10 +12,12 @@ HTMLWidgets.widget({
 
         const data = HTMLWidgets.dataframeToD3(opts.data);
         let margin = ({top: 65, right: 60, bottom: 30, left: 65});
-        let formatPercent = d3.format(".0%");
-        function yearTickFormat(x) {return x === 0 ? "Arrival" : "Year " + x}
         let bisectDate = d3.bisector(function(d) { return d.year; }).left;
         let title = opts.hasOwnProperty("title") ? opts.title : "";
+        let gradFill = opts.hasOwnProperty("grad_fill") ? opts.grad_fill : "#E8BF6A";
+        let vLineStroke = opts.hasOwnProperty("vline_stroke") ? opts.vline_stroke : "red";
+        let formatPercent = d3.format(".0%");
+        function yearTickFormat(x) {return x === 0 ? "Arrival" : "Year " + x}
 
         const svg = d3.select(el)
                     .append("svg")
@@ -33,10 +35,11 @@ HTMLWidgets.widget({
         let y = d3.scaleLinear()
             .domain([0, d3.max(series, d => d3.max(d, d => d[1]))]).nice()
             .range([height - margin.bottom, margin.top]);
-/*
+        /*
         let color = d3.scaleOrdinal()
             .domain(["continuation", "graduation"])
-            .range(["#463077", "#E8BF6A"]); */
+            .range(["#463077", "#E8BF6A"]);
+        */
 
         let area = d3.area()
             .x(d => x(d.data.year))
@@ -59,16 +62,15 @@ HTMLWidgets.widget({
         svg.append("text")
             .attr("x", margin.left)
             .attr("y", margin.top/2.7)
-            //.attr("font-weight", "bold")
             .attr("font-size", "1.5em")
-            .text(title)
+            .text(title);
 
 
-            svg.append("linearGradient")
-              .attr("id", "perc-gradient1")
-              .attr("gradientUnits", "userSpaceOnUse")
-              .attr("x1", 0).attr("y1", y(0))
-              .attr("x2", 0).attr("y2", y(0.9))
+        svg.append("linearGradient")
+            .attr("id", "perc-gradient1")
+            .attr("gradientUnits", "userSpaceOnUse")
+            .attr("x1", 0).attr("y1", y(0))
+            .attr("x2", 0).attr("y2", y(0.9))
             .selectAll("stop")
               .data([
                 {offset: "0%", color: "#cbb4d4"},
@@ -78,17 +80,17 @@ HTMLWidgets.widget({
               .attr("offset", d => d.offset)
               .attr("stop-color", d => d.color);
 
-          svg.append("g")
+        svg.append("g")
               .selectAll("path")
               .data(series)
               .enter().append("path")
                 .attr("opacity", d => d.key === "continuation" ? 0.9 : 1)
                 .attr("d", area)
-                .attr("fill", d => d.key === "continuation" ? "url(#perc-gradient1)" : "#E8BF6A")
+                .attr("fill", d => d.key === "continuation" ? "url(#perc-gradient1)" : gradFill)
                 .attr("stroke-width", "5px");
 
           svg.append("line")
-            .attr("stroke", "red")
+            .attr("stroke", vLineStroke)
             .attr("stroke-width", 3)
             .attr("stroke-dasharray", "9, 8")
             .attr("x1", x(4))
