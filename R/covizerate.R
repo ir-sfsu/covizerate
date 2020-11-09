@@ -2,18 +2,20 @@
 #'
 #' @param data a table of data
 #' @param title chart title
+#' @param animate whether to include a gradual horizontal reveal
 #'
 #' @import htmlwidgets
 #'
 #' @export
-covizerate <- function(data, title = NULL) {
+covizerate <- function(data, title = NULL, animate = FALSE) {
 
   stopifnot(inherits(data, "data.frame"))
   stopifnot(all(c("year", "continuation", "graduation") %in% names(data)))
 
   x = list(
     data = data,
-    title = title
+    title = title,
+    animate = animate
   )
 
   htmlwidgets::createWidget(

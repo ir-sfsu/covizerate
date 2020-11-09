@@ -1,0 +1,10 @@
+.viz-title {
+  font-size: 1.5em;
+  font-weight: bold;
+  font-family: Arial;
+  font-style: italic;
+}
+
+.cont-text, .grad-text {
+  font-family: Arial;
+}

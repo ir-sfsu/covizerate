@@ -11,7 +11,7 @@ HTMLWidgets.widget({
       renderValue: function(opts) {
 
         const data = HTMLWidgets.dataframeToD3(opts.data);
-        let margin = ({top: 65, right: 60, bottom: 30, left: 65});
+        let margin = ({top: 65, right: 60, bottom: 30, left: 70});
         let bisectDate = d3.bisector(function(d) { return d.year; }).left;
         let title = opts.hasOwnProperty("title") ? opts.title : "";
         let gradFill = opts.hasOwnProperty("grad_fill") ? opts.grad_fill : "#E8BF6A";
@@ -35,6 +35,10 @@ HTMLWidgets.widget({
         let y = d3.scaleLinear()
             .domain([0, d3.max(series, d => d3.max(d, d => d[1]))]).nice()
             .range([height - margin.bottom, margin.top]);
+
+        let y2 = d3.scaleLinear()
+            .domain([0, 1])
+            .range([height - margin.bottom, margin.top])
         /*
         let color = d3.scaleOrdinal()
             .domain(["continuation", "graduation"])
@@ -60,11 +64,10 @@ HTMLWidgets.widget({
             .call(g => g.select(".domain").remove());
 
         svg.append("text")
+            .attr("class", "viz-title")
             .attr("x", margin.left)
             .attr("y", margin.top/2.7)
-            .attr("font-size", "1.5em")
             .text(title);
-
 
         svg.append("linearGradient")
             .attr("id", "perc-gradient1")
@@ -79,6 +82,7 @@ HTMLWidgets.widget({
             .enter().append("stop")
               .attr("offset", d => d.offset)
               .attr("stop-color", d => d.color);
+
 
         svg.append("g")
               .selectAll("path")
@@ -104,6 +108,39 @@ HTMLWidgets.widget({
           svg.append("g")
               .call(yAxis);
 
+          if (opts.animate) {
+
+            let gradient = d3.select('svg').append("defs")
+              .append("linearGradient")
+                .attr("id", "gradient")
+                .attr("x1", "0%")
+                .attr("x2", "0%")
+                .attr("spreadMethod", "pad");
+
+            gradient.append("stop")
+                .attr("offset", "0%")
+                .attr("stop-color", "#fff")
+                .attr("stop-opacity", 1);
+
+            gradient.append("stop")
+                .attr("offset", "100%")
+                .attr("stop-color", "#fff")
+                .attr("stop-opacity", 0);
+
+            let fadeBB = svg.append('rect')
+              .attr('x', margin.left)
+              .attr('y', margin.top-10)
+              .attr('width', width)
+              .attr('height', height-margin.bottom-50)
+              .style("fill", "url(#gradient)");
+
+            fadeBB.transition()
+              .delay(1000)
+              .duration(5500)
+              .attr('width', 0)
+              .attr('x', width);
+            }
+
           let focus = svg.append("g")
               .attr("class", "focus")
               .style("display", "none");
@@ -115,14 +152,14 @@ HTMLWidgets.widget({
               .attr("y1", height - margin.bottom);
 
           focus.append("circle")
-              .attr("r", 10)
+              .attr("r", 6)
               .attr("stroke", "black")
               .attr("fill", "gold");
 
           focus.append("rect")
             .attr("class", "text-bb")
-            .attr("x", -68)
-            .attr("width", 135)
+            .attr("x", -72)
+            .attr("width", 142)
             .attr("opacity", 0.8)
             .attr("rx", 10)
             .attr("stroke", "lightgrey")
@@ -150,18 +187,21 @@ HTMLWidgets.widget({
 
           function mousemove() {
             let x0 = x.invert(d3.mouse(this)[0]),
-                i = bisectDate(data, x0, 1),
-                d0 = data[i - 1],
-                d1 = data[i],
-                d = x0 - d0.year > d1.year - x0 ? d1 : d0;
+            i = bisectDate(data, x0, 1),
+            d0 = data[i - 1],
+            d1 = data[i],
+            d = x0 - d0.year > d1.year - x0 ? d1 : d0;
+            let hasGrad = d.graduation > 0;
+            let translateY = y(d.graduation) - y(d.continuation);
             focus.attr("transform", `translate(${x(d.year)}, ${y(d.continuation)})`);
             focus.select(".text-bb")
               .attr("visibility", "visible")
-              .attr("height", () => d.graduation > 0 ? 50 : 25)
-              .attr("y", () => d.graduation > 0 ? -60 : -35);
+              .attr("height", () => hasGrad ? 50 : 25)
+              .attr("y", () => hasGrad ? -60 : -35);
             focus.select(".cont-text").text(() => 'Continuation: ' + formatPercent(d.continuation));
-            focus.select(".grad-text").text(() => d.graduation > 0 ? 'Graduation: ' + formatPercent(d.graduation) : '');
+            focus.select(".grad-text").text(() => hasGrad ? 'Graduation: ' + formatPercent(d.graduation) : '');
           }
+
       },
 
       resize: function(width, height) {

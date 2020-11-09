@@ -4,12 +4,14 @@
 \alias{covizerate}
 \title{Create a covizerate visualization}
 \usage{
-covizerate(data, title = NULL)
+covizerate(data, title = NULL, animate = TRUE)
 }
 \arguments{
 \item{data}{a table of data}
 
 \item{title}{chart title}
+
+\item{animate}{whether to include a gradual horizontal reveal}
 }
 \description{
 Create a covizerate visualization
